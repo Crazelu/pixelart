@@ -25,8 +25,9 @@ class ImagePainter extends CustomPainter {
   final PaintEffect paintEffect;
 
   //Reference: https://editor.p5js.org/codingtrain/sketches/r4ApYWpH_
-  static const density = 'Ñ@#W\$9876543210?!abc;:+=-,._ ';
-  final _length = density.length;
+  static const _density = 'Ñ@#W\$9876543210?!abc;:+=-,._ ';
+  static const _reversedDensity = ' _.,-=+:;cba!?0123456789\$W#@Ñ';
+  final _length = _density.length;
 
   const ImagePainter({
     required this.image,
@@ -60,12 +61,11 @@ class ImagePainter extends CustomPainter {
 
       switch (paintEffect) {
         case PaintEffect.emboss:
-          final characters = density.split('').reversed.join('');
-          char = characters[characterIndex];
+          char = _reversedDensity[characterIndex];
 
           break;
         default:
-          char = density[characterIndex];
+          char = _density[characterIndex];
       }
 
       TextPainter(

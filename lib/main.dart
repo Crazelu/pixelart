@@ -69,32 +69,14 @@ class _MyHomePageState extends State<PixelArtDemoPage> {
   static void _resizeImage(List<dynamic> args) {
     final sendPort = args[0] as SendPort;
     try {
-      final extension = (args[1] as String)
-          .split(Platform.pathSeparator)
-          .last
-          .split(".")
-          .last
-          .toLowerCase();
-
       Uint8List bytes = File(args[1]).readAsBytesSync();
-      img.Image? conformingPNG;
-
-      switch (extension) {
-        case "png":
-          conformingPNG = img.decodePng(bytes);
-          break;
-        case "jpg":
-        case "jpeg":
-          final jpgImage = img.decodeJpg(bytes);
-          conformingPNG = img.decodePng(img.encodePng(jpgImage!));
-          break;
-      }
 
       final resizedImage = img.copyResize(
-        conformingPNG!,
+        img.decodeImage(bytes)!,
         width: (args[2] as num).toInt(),
         maintainAspect: true,
         backgroundColor: img.ColorRgb8(255, 255, 255),
+        interpolation: img.Interpolation.average,
       );
 
       Isolate.exit(sendPort, img.encodePng(resizedImage));
@@ -139,10 +121,20 @@ class _MyHomePageState extends State<PixelArtDemoPage> {
             child: _loading
                 ? const CircularProgressIndicator()
                 : _image == null
-                    ? Text(
-                        "Upload an image to get started.\nOnly PNG and JPG files supported",
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodyLarge,
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "📸",
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.displayMedium,
+                          ),
+                          Text(
+                            "Upload an image to get started",
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                        ],
                       )
                     : CustomPaint(
                         painter: ImagePainter(
